@@ -39,3 +39,15 @@ Titular: **@mooshmassacre**. Este projeto usa uma [licença proprietária restri
 Crédito obrigatório: **Ferramenta utilizada: Artboards 2 AE — @mooshmassacre. https://github.com/mooshmassacre/artboards-2-ae**
 
 O texto completo da licença prevalece sobre este resumo. A licença acompanha as cópias deste commit em diante. A tag histórica `v1.0.0` permanece inalterada e não contém o arquivo de licença.
+
+## Uso comercial
+
+Solicite cadastro em **gustavo@mooshmassacre.studio** antes de iniciar uso comercial. No Brasil, pagamento por **Pix em reais**; para clientes internacionais, **PayPal**, com moeda e condições acordadas no cadastro. Os dados de pagamento são fornecidos em privado.
+
+O fluxo é: solicitação → condições e licença → aceite → ativação escrita → demonstrativo por trabalho → pagamento → confirmação de recebimento. Não há mensalidade ou taxa de cadastro; os royalties seguem a licença.
+
+- [Processo comercial completo](outputs/comercial/PROCESSO-COMERCIAL.md)
+- [Modelos de cadastro, aceite e apuração](outputs/comercial/MODELOS-DE-MENSAGENS.md)
+- [Modelo vazio de controle interno](outputs/comercial/REGISTRO-INTERNO-MODELO.md)
+
+Somente modelos vazios devem ser versionados. Dados de clientes, contratos preenchidos e comprovantes ficam em armazenamento privado. Este repositório não envia mensagens nem processa pagamentos.

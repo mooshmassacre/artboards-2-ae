@@ -1,5 +1,11 @@
 # Histórico de versões
 
+## Processo comercial — 2026-09-23
+
+- Canal oficial gustavo@mooshmassacre.studio; Pix em BRL e PayPal internacional.
+- Fluxo de cadastro, aceite, ativação, apuração e confirmação de pagamento.
+- Modelos vazios de mensagens e registro interno; dados preenchidos fora do Git.
+
 ## Licenciamento — 2026-09-23
 
 - Licença proprietária restrita em nome de @mooshmassacre.

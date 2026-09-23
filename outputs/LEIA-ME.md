@@ -70,3 +70,9 @@ Titular: **@mooshmassacre**. Leia [a licença completa](LICENSE.md) antes de usa
 Crédito obrigatório: **Ferramenta utilizada: Artboards 2 AE — @mooshmassacre. https://github.com/mooshmassacre/artboards-2-ae**
 
 Guarde `LICENSE.md` junto ao JSX. A licença proprietária não transfere a autoria dos seus trabalhos finais ao titular da ferramenta.
+
+## Cadastro comercial
+
+Escreva para **gustavo@mooshmassacre.studio**. Brasil: Pix em reais. Clientes internacionais: PayPal com moeda acordada no cadastro. O atendimento fornecerá os dados de pagamento em privado; não presuma que o e-mail seja uma chave de pagamento.
+
+Consulte [o processo comercial](comercial/PROCESSO-COMERCIAL.md) e os [modelos de mensagens e demonstrativos](comercial/MODELOS-DE-MENSAGENS.md). O uso comercial começa após aceite e ativação escrita.

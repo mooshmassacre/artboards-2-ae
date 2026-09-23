@@ -3,3 +3,6 @@ work/
 *.psd
 *.psb
 *.log
+
+# Registros comerciais preenchidos ficam fora do versionamento.
+comercial-privado/
