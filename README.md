@@ -26,3 +26,16 @@ A análise de sintaxe e os testes de lógica usam substitutos das APIs. A versã
 - `outputs/LEIA-ME.md`: documentação para uso.
 - `tests/validate.cjs`: validação de sintaxe, geometria e proteções.
 - `CHANGELOG.md`: histórico de versões.
+
+## Licença e créditos
+
+Titular: **@mooshmassacre**. Este projeto usa uma [licença proprietária restrita](LICENSE); não é open source.
+
+- Uso não comercial e adaptações internas permitidos com créditos.
+- Uso comercial sujeito a cadastro escrito e pagamento de **10% do lucro de cada trabalho** que utilizar a ferramenta, conforme a licença.
+- Lucro definido como receita recebida menos custos diretos elegíveis e comprovados; despesas gerais não são dedutíveis.
+- Redistribuição, revenda, sublicenciamento e disponibilização como serviço dependem de autorização escrita.
+
+Crédito obrigatório: **Ferramenta utilizada: Artboards 2 AE — @mooshmassacre. https://github.com/mooshmassacre/artboards-2-ae**
+
+O texto completo da licença prevalece sobre este resumo. A licença acompanha as cópias deste commit em diante. A tag histórica `v1.0.0` permanece inalterada e não contém o arquivo de licença.

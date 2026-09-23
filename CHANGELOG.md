@@ -1,5 +1,11 @@
 # Histórico de versões
 
+## Licenciamento — 2026-09-23
+
+- Licença proprietária restrita em nome de @mooshmassacre.
+- Créditos obrigatórios, adaptações internas e royalties de 10% do lucro por trabalho comercial.
+- Código funcional permanece na versão 1.0.0; a tag histórica não foi alterada.
+
 ## 1.0.0 — 2026-09-23
 
 Primeira versão oficial do Artboards 2 AE.

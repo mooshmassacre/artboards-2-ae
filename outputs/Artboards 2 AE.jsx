@@ -1,5 +1,11 @@
 #target photoshop
 /* Artboards 2 AE — v1.0.0
+   Copyright (c) 2026 @mooshmassacre. Direitos reservados conforme lei aplicavel.
+   Licenca proprietaria restrita: consulte LICENSE.md antes de usar ou adaptar.
+   Creditos obrigatorios: Artboards 2 AE — @mooshmassacre.
+   Uso comercial: cadastro escrito e royalties de 10% do lucro por trabalho,
+   conforme definicoes, deducoes e condicoes da licenca completa.
+   Redistribuicao e sublicenciamento proibidos sem autorizacao escrita.
    ExtendScript / ScriptUI. Original document is never edited or saved.
    Native artboard dissolution + regrouping, with measured coordinate repair.
    No flatten(), merge(), rasterize(), resizeImage(), or color conversion.

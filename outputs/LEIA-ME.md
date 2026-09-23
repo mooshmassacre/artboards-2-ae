@@ -62,3 +62,11 @@ O procedimento de dissolução, agrupamento, máscaras e fundos foi conferido no
 
 - [Adobe — propriedades e comportamento de artboards](https://helpx.adobe.com/photoshop/desktop/create-manage-layers/layout-design-tools/artboard-properties.html).
 - [Adobe — preparação e importação de imagens e PSDs no After Effects](https://helpx.adobe.com/after-effects/desktop/import-files/import-still-images/preparing-importing-still-images.html).
+
+## Licença e créditos
+
+Titular: **@mooshmassacre**. Leia [a licença completa](LICENSE.md) antes de usar ou adaptar. Uso não comercial e adaptações internas são permitidos com créditos. Uso comercial exige cadastro escrito e royalties de **10% do lucro por trabalho**, definido como receita recebida menos custos diretos elegíveis comprovados. Redistribuição e revenda dependem de autorização escrita.
+
+Crédito obrigatório: **Ferramenta utilizada: Artboards 2 AE — @mooshmassacre. https://github.com/mooshmassacre/artboards-2-ae**
+
+Guarde `LICENSE.md` junto ao JSX. A licença proprietária não transfere a autoria dos seus trabalhos finais ao titular da ferramenta.
