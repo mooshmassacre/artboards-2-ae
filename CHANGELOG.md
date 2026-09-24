@@ -5,7 +5,8 @@
 - Corrige grupos fora do quadro: todas as artboards agora são alinhadas pela origem ao canvas da primeira, mantendo as coordenadas internas das layers.
 - Fundos e máscaras de recorte acompanham o novo posicionamento.
 - Grupos ficam sobrepostos, sem escala; grupos opacos superiores podem cobrir os inferiores.
-- Testes de regressão para múltiplas artboards e origens negativas. Execução no Photoshop ainda não validada nesta sessão.
+- Testes de regressão para múltiplas artboards e origens negativas.
+- Validação manual bem-sucedida no Photoshop e After Effects confirmada por @mooshmassacre em 24/09/2026, para o fluxo testado; versões dos aplicativos e detalhes do PSD não informados.
 
 ## 1.0.1 — 2026-09-23
 

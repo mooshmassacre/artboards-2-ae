@@ -54,7 +54,9 @@ Se a conversão falhar, a cópia incompleta é fechada sem salvar e o original v
 
 Análise sintática do JavaScript após remover a diretiva específica `#target photoshop`, mais verificações automatizadas, incluindo regressão para artboards lado a lado e origens negativas, além de testes de lógica e estrutura: offsets positivos e negativos, ausência de compensação duplicada, rejeição de mudanças de tamanho e offsets fracionários, normalização de origem, detecção de erro de posição, layers vazias, recorte sem exclusão, ausência de chamadas de rasterização/achatamento e proteção contra sobrescrita.
 
-**Não executado no Photoshop ou After Effects nesta sessão.** Os testes utilizam substitutos das APIs para verificar a lógica; não comprovam o comportamento do Action Manager ou da interface no aplicativo. A sintaxe usa construções compatíveis com ExtendScript, mas não foi analisada pelo interpretador do Photoshop. Faça a primeira execução em um PSD representativo e revise o resultado.
+**Validação manual confirmada:** em 24/09/2026, @mooshmassacre informou que a versão 1.0.2 foi validada com sucesso no Photoshop e no After Effects. Essa confirmação se refere ao fluxo testado pelo autor; as versões dos aplicativos e os detalhes do PSD não foram informados.
+
+Os 13 testes automatizados utilizam substitutos das APIs para verificar a lógica e não substituem a execução nos aplicativos. Revise o resultado ao trabalhar com PSDs de estrutura diferente.
 
 ## Referências
 

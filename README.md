@@ -18,7 +18,9 @@ Com Node.js instalado, execute na raiz do repositório:
 node tests/validate.cjs
 ```
 
-A análise de sintaxe e os testes de lógica usam substitutos das APIs. A versão 1.0.2 ainda não foi validada dentro do Photoshop ou After Effects.
+A versão **1.0.2 foi validada com sucesso no Photoshop e no After Effects por @mooshmassacre**, conforme confirmação em 24/09/2026. A validação cobre o fluxo testado pelo autor; versões dos aplicativos e detalhes do PSD não foram informados.
+
+A análise de sintaxe e os 13 testes automatizados de lógica usam substitutos das APIs e complementam essa validação manual.
 
 ## Arquivos
 
