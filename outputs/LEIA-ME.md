@@ -1,4 +1,4 @@
-# Artboards 2 AE — versão 1.0.1
+# Artboards 2 AE — versão 1.0.2
 
 Script JSX para Photoshop desktop, com interface em português. Trabalha em uma cópia aberta do documento; não edita nem salva o original. Projetado para Photoshop com suporte a artboards e ExtendScript.
 
@@ -17,9 +17,9 @@ Não é necessário instalar o script na pasta do Photoshop. Execute-o pelo menu
 
 Cada artboard vira um grupo normal com o mesmo nome. Layers e subgrupos existentes mantêm seus IDs na cópia, sua ordem e sua hierarquia. Textos, Smart Objects, ajustes, máscaras e efeitos nas layers internas não são rasterizados pelo script. A interpretação dessas propriedades no After Effects depende do suporte do importador.
 
-A disposição espacial é mantida: artboards lado a lado continuam lado a lado. Não há centralização de cada artboard em uma composição independente. Os grupos são importados pelo AE como composições aninhadas; `Retain Layer Sizes` não garante que cada precomp terá as dimensões exatas da antiga artboard.
+Cada grupo é alinhado pelo canto superior esquerdo de sua artboard ao canto superior esquerdo do canvas final. As layers mantêm suas coordenadas locais dentro da própria artboard; os grupos ficam sobrepostos, prontos para serem alternados ou animados. Um grupo opaco acima de outro pode cobri-lo: oculte os grupos superiores para inspecionar os inferiores. Não há redimensionamento; artboards maiores que a primeira podem ter conteúdo fora do quadro. Os grupos são importados pelo AE como composições aninhadas; `Retain Layer Sizes` não garante que cada precomp terá as dimensões exatas da antiga artboard.
 
-O canvas final usa exatamente o retângulo da **primeira artboard no painel Layers, de cima para baixo**, inclusive se ela estiver oculta. Seu canto superior esquerdo vira a origem do PSD. As demais artboards mantêm suas posições relativas e podem ficar fora da área visível. O recorte não apaga seus pixels no Photoshop. Para mudar a artboard de referência, coloque-a no topo do painel antes de executar. Limites fracionários são recusados para evitar arredondar o tamanho ou reamostrar layers.
+O canvas final usa exatamente o retângulo da **primeira artboard no painel Layers, de cima para baixo**, inclusive se ela estiver oculta. Seu canto superior esquerdo vira a origem do PSD. As demais artboards são deslocadas para a mesma origem, eliminando o espaçamento da disposição lado a lado. O recorte não apaga seus pixels no Photoshop. Para mudar a artboard de referência, coloque-a no topo do painel antes de executar. Limites fracionários são recusados para evitar arredondar o tamanho ou reamostrar layers.
 
 ## Opções
 
@@ -34,7 +34,7 @@ Desativar recortes ou fundos altera intencionalmente a aparência. Os padrões m
 
 A conversão usa a operação nativa de dissolver artboards e reagrupar seus filhos por ID. Marcadores temporários de um pixel medem possíveis mudanças da origem do documento, inclusive ao dissolver a última artboard. Eles são removidos antes do salvamento.
 
-O script corrige apenas translações medidas, em pixels inteiros. Ele não subtrai indiscriminadamente a origem de cada artboard: as layers podem já estar em coordenadas globais. Depois compara os limites de todas as layers não vazias com os valores anteriores à conversão. O ajuste final do canvas utiliza recorte com exclusão de pixels desativada.
+O script primeiro corrige mudanças involuntárias de origem usando os marcadores. Em seguida, desloca cada grupo pela diferença entre a origem da primeira artboard e sua própria origem. O recorte final transforma essas posições em coordenadas locais: posição final da layer = posição global original − origem da sua artboard. As translações são inteiras; offsets fracionários inesperados são recusados. Depois compara os limites de todas as layers não vazias com os valores anteriores à conversão. O ajuste final do canvas utiliza recorte com exclusão de pixels desativada.
 
 A verificação também confere nomes, hierarquia, ordem, tipos, visibilidade, opacidade e modo de mesclagem. As posições são verificadas antes das novas máscaras. Máscaras e fundos são criados antes de reduzir o canvas, para alcançar também artboards que ficarão fora dele. Uma nova medição dos limites após as máscaras verifica o deslocamento global causado pelo recorte final. Isso não equivale a uma comparação visual pixel a pixel de todos os efeitos.
 
@@ -52,7 +52,7 @@ Se a conversão falhar, a cópia incompleta é fechada sem salvar e o original v
 
 ## Validação realizada
 
-Análise sintática do JavaScript após remover a diretiva específica `#target photoshop`, mais 11 verificações automatizadas de lógica e estrutura: offsets positivos e negativos, ausência de compensação duplicada, rejeição de mudanças de tamanho e offsets fracionários, normalização de origem, detecção de erro de posição, layers vazias, recorte sem exclusão, ausência de chamadas de rasterização/achatamento e proteção contra sobrescrita.
+Análise sintática do JavaScript após remover a diretiva específica `#target photoshop`, mais verificações automatizadas, incluindo regressão para artboards lado a lado e origens negativas, além de testes de lógica e estrutura: offsets positivos e negativos, ausência de compensação duplicada, rejeição de mudanças de tamanho e offsets fracionários, normalização de origem, detecção de erro de posição, layers vazias, recorte sem exclusão, ausência de chamadas de rasterização/achatamento e proteção contra sobrescrita.
 
 **Não executado no Photoshop ou After Effects nesta sessão.** Os testes utilizam substitutos das APIs para verificar a lógica; não comprovam o comportamento do Action Manager ou da interface no aplicativo. A sintaxe usa construções compatíveis com ExtendScript, mas não foi analisada pelo interpretador do Photoshop. Faça a primeira execução em um PSD representativo e revise o resultado.
 

@@ -1,5 +1,5 @@
 #target photoshop
-/* Artboards 2 AE — v1.0.1
+/* Artboards 2 AE — v1.0.2
    Copyright (c) 2026 @mooshmassacre. Direitos reservados conforme lei aplicavel.
    Licenca proprietaria restrita: consulte LICENSE.md antes de usar ou adaptar.
    Creditos obrigatorios: Artboards 2 AE — @mooshmassacre.
@@ -194,6 +194,31 @@
             if (anchor) translateRoot(root,anchor);
         }
     }
+    function boardOffset(board, canvas) {
+        return [canvas[0] - board.rect[0], canvas[1] - board.rect[1]];
+    }
+    function alignedGeometry(canvas) {
+        var result = [];
+        for (var i = 0; i < records.length; i++) {
+            var rec = records[i]; if (!rec.box) continue;
+            var offset = [0,0];
+            for (var j = 0; j < boards.length; j++) {
+                if (descendant(rec.id,resolved(boards[j].id))) { offset = boardOffset(boards[j],canvas); break; }
+            }
+            result.push({id:rec.id,name:rec.name,box:[rec.box[0]+offset[0],rec.box[1]+offset[1],rec.box[2]+offset[0],rec.box[3]+offset[1]]});
+        }
+        return result;
+    }
+    function alignBoards(canvas) {
+        var expected = alignedGeometry(canvas);
+        for (var i = 0; i < boards.length; i++) {
+            var board = boards[i], offset = boardOffset(board,canvas), b = board.marker.box;
+            translateRoot(find(copy,resolved(board.id)),{id:board.marker.id,
+                box:[b[0]+offset[0],b[1]+offset[1],b[2]+offset[0],b[3]+offset[1]]});
+        }
+        // Every original leaf must keep its position relative to its own artboard.
+        checkPositions(0,0,expected);
+    }
     function checkPositions(dx, dy, baseline) {
         var geometry = baseline || records;
         for (var i = 0; i < geometry.length; i++) {
@@ -242,7 +267,7 @@
         var bg = p.add('checkbox',undefined,'Preservar fundos como layers de cor sólida editáveis'); bg.value = true;
         var unlockBox = p.add('checkbox',undefined,'Deixar as layers da cópia desbloqueadas para animação'); unlockBox.value = true;
         var save = p.add('checkbox',undefined,'Escolher onde salvar o PSD ao terminar'); save.value = true;
-        var note = w.add('statictext',undefined,'O PSD terá o tamanho da primeira artboard no painel Layers (de cima para baixo).\nA verificação de hierarquia e coordenadas é obrigatória.',{multiline:true});
+        var note = w.add('statictext',undefined,'Todos os grupos serão alinhados ao canto superior esquerdo da primeira artboard.\nO PSD terá o tamanho dela. Os grupos ficarão sobrepostos, sem redimensionamento.',{multiline:true});
         note.preferredSize = [550,45];
         var buttons = w.add('group'); buttons.alignment = 'right';
         buttons.add('button',undefined,'Cancelar',{name:'cancel'}); buttons.add('button',undefined,'Converter cópia',{name:'ok'});
@@ -296,10 +321,13 @@
         for (i = 0; i < boards.length; i++) { update('Convertendo ' + (i+1) + '/' + boards.length + ': ' + boards[i].name,10+50*i/boards.length); convert(boards[i]); }
         update('Conferindo offsets e coordenadas...',65);
         repairCoordinates(); checkPositions(0,0);
+        update('Alinhando todos os grupos ao quadro da primeira artboard...',75);
+        alignBoards(canvas);
         update('Preservando recortes e fundos...',80);
         for (i = 0; i < boards.length; i++) {
             var board = boards[i], group = find(copy,resolved(board.id));
-            var area = board.rect.slice(0);
+            var offset = boardOffset(board,canvas);
+            var area = [board.rect[0]+offset[0],board.rect[1]+offset[1],board.rect[2]+offset[0],board.rect[3]+offset[1]];
             if (options.bg && board.bg !== 3) solidBackground(group,area,board.rgb);
             if (options.clip) { select(group.id); boxSelection(area); maskFromSelection(); }
         }
