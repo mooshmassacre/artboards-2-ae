@@ -1,4 +1,4 @@
-# Artboards 2 AE — versão 1.0.2
+# Artboards 2 AE — versão 1.0.3
 
 Script JSX para Photoshop desktop, com interface em português. Trabalha em uma cópia aberta do documento; não edita nem salva o original. Projetado para Photoshop com suporte a artboards e ExtendScript.
 
@@ -32,6 +32,8 @@ Desativar recortes ou fundos altera intencionalmente a aparência. Os padrões m
 
 ## Coordenadas e verificações
 
+Antes da conversão, o script desativa o aninhamento, o reposicionamento e a expansão automáticos das artboards na cópia ativa. Após cada conversão, verifica os pais das layers e a ordem dos grupos principais para impedir que um grupo seja inserido em outro e deslocado duas vezes.
+
 A conversão usa a operação nativa de dissolver artboards e reagrupar seus filhos por ID. Marcadores temporários de um pixel medem possíveis mudanças da origem do documento, inclusive ao dissolver a última artboard. Eles são removidos antes do salvamento.
 
 O script primeiro corrige mudanças involuntárias de origem usando os marcadores. Em seguida, desloca cada grupo pela diferença entre a origem da primeira artboard e sua própria origem. O recorte final transforma essas posições em coordenadas locais: posição final da layer = posição global original − origem da sua artboard. As translações são inteiras; offsets fracionários inesperados são recusados. Depois compara os limites de todas as layers não vazias com os valores anteriores à conversão. O ajuste final do canvas utiliza recorte com exclusão de pixels desativada.
@@ -56,7 +58,9 @@ Análise sintática do JavaScript após remover a diretiva específica `#target 
 
 **Validação manual confirmada:** em 24/09/2026, @mooshmassacre informou que a versão 1.0.2 foi validada com sucesso no Photoshop e no After Effects. Essa confirmação se refere ao fluxo testado pelo autor; as versões dos aplicativos e os detalhes do PSD não foram informados.
 
-Os 13 testes automatizados utilizam substitutos das APIs para verificar a lógica e não substituem a execução nos aplicativos. Revise o resultado ao trabalhar com PSDs de estrutura diferente.
+Os 24 testes automatizados utilizam substitutos das APIs para verificar a lógica e não substituem a execução nos aplicativos. Revise o resultado ao trabalhar com PSDs de estrutura diferente.
+
+**Correção 1.0.3 confirmada em 24/09/2026:** @mooshmassacre informou sucesso da candidata rc.3 no PSD que apresentava aninhamento indevido, diagnosticado no Photoshop 27.10.0. A versão final mantém a lógica dessa candidata. O novo teste de importação no After Effects não foi confirmado separadamente para esta correção.
 
 ## Referências
 

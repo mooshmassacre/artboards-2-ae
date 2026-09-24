@@ -1,5 +1,13 @@
 # Histórico de versões
 
+## 1.0.3 — 2026-09-24
+
+- Corrige aninhamento automático de grupos durante a dissolução das artboards, que causava deslocamento duplicado de conteúdo.
+- Desativa autoNestEnabled, autoPositionEnabled e autoExpandEnabled na cópia antes da conversão.
+- Verifica hierarquia após cada conversão e posições após cada movimento.
+- Move grupos pelo ID com a ação nativa Move e inclui diagnóstico copiável em caso de falha.
+- 24 testes automatizados aprovados. Correção da candidata rc.3 confirmada pelo autor no PSD problemático, diagnosticado no Photoshop 27.10.0.
+
 ## 1.0.2 — 2026-09-24
 
 - Corrige grupos fora do quadro: todas as artboards agora são alinhadas pela origem ao canvas da primeira, mantendo as coordenadas internas das layers.

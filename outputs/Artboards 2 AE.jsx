@@ -1,5 +1,5 @@
 #target photoshop
-/* Artboards 2 AE — v1.0.2
+/* Artboards 2 AE — v1.0.3
    Copyright (c) 2026 @mooshmassacre. Direitos reservados conforme lei aplicavel.
    Licenca proprietaria restrita: consulte LICENSE.md antes de usar ou adaptar.
    Creditos obrigatorios: Artboards 2 AE — @mooshmassacre.
@@ -18,6 +18,7 @@
     var oldUnits = app.preferences.rulerUnits, oldDialogs = app.displayDialogs;
     var records = [], boards = [], replacements = {}, markers = [], options;
     var TOL = 0.05;
+    var lastMove = 'Nenhum';
 
     function fail(message) { throw new Error(message); }
     function near(a, b) { return Math.abs(a - b) <= TOL; }
@@ -146,9 +147,48 @@
         copy.selection.fill(color, ColorBlendMode.NORMAL, 100, false); copy.selection.deselect();
         var m = {id:l.id, box:bounds(l.id), board:board.id}; markers.push(m); board.marker = m;
     }
+    function disableArtboardAutomation() {
+        if (!copy || (source && copy.id === source.id) || app.activeDocument.id !== copy.id)
+            fail('Proteção: as opções de artboard só podem ser alteradas na cópia ativa.');
+        // Same document-scoped editArtboardEvent flags used by Adobe ArtboardExport.inc.
+        // Disable BEFORE adding markers, dissolving, regrouping or moving any content.
+        select(boards[0].id);
+        var features = ['autoNestEnabled','autoPositionEnabled','autoExpandEnabled'];
+        for (var i = 0; i < features.length; i++) {
+            var d = new ActionDescriptor(), r = new ActionReference();
+            r.putEnumerated(S('layer'),S('ordinal'),S('targetEnum'));
+            d.putReference(S('null'),r); d.putBoolean(S(features[i]),false);
+            executeAction(S('editArtboardEvent'),d,DialogModes.NO);
+        }
+    }
+    function checkParents(originalRoots) {
+        // Top-level artboards must become sibling groups, never groups inside other artboards.
+        for (var i = 0; i < records.length; i++) {
+            var rec = records[i], layer = find(copy,resolved(rec.id));
+            if (!layer) fail('Layer ausente após conversão: ' + rec.name + ' (ID ' + rec.id + ').');
+            var parent = layer.parent.typename === 'Document' ? 0 : layer.parent.id;
+            if (parent !== resolved(rec.parent))
+                fail('Hierarquia alterada durante a conversão: "' + rec.name + '" (ID ' + layer.id + ').' +
+                    '\nPai esperado (ID): ' + resolved(rec.parent) + '\nPai obtido (ID): ' + parent +
+                    '\nO alinhamento foi interrompido para impedir deslocamento duplicado.');
+        }
+        var current = ids(copy);
+        if (current.length !== originalRoots.length) fail('Quantidade de grupos principais alterada durante a conversão.');
+        for (i = 0; i < current.length; i++)
+            if (current[i] !== resolved(originalRoots[i])) fail('Ordem principal alterada durante a conversão.');
+    }
     function convert(board) {
         var old = find(copy, board.id);
-        var children = ids(old);
+        // Only original direct children plus our marker belong in the replacement group.
+        var children = board.children.slice(0), actualChildren = ids(old);
+        children.push(board.marker.id);
+        if (actualChildren.length !== children.length) fail('Conteúdo inesperado na artboard antes de converter: ' + board.name);
+        for (var childIndex = 0; childIndex < actualChildren.length; childIndex++) {
+            var known = false;
+            for (var expectedIndex = 0; expectedIndex < children.length; expectedIndex++)
+                if (actualChildren[childIndex] === children[expectedIndex]) known = true;
+            if (!known) fail('Outra layer entrou automaticamente na artboard: ' + board.name);
+        }
         select(board.id);
         var d = new ActionDescriptor(), r = new ActionReference();
         r.putEnumerated(S('layer'), S('ordinal'), S('targetEnum')); d.putReference(S('null'), r);
@@ -171,6 +211,19 @@
         while (l && l.typename !== 'Document') { if (l.id === root) return true; l = l.parent; }
         return false;
     }
+    function moveGroupByID(root, dx, dy) {
+        // Use Photoshop's native Move action with a single explicit layer ID.
+        // Avoid the legacy LayerSet.translate dispatch for nested text layers.
+        select(root.id);
+        copy.activeChannels = copy.componentChannels;
+        copy.selection.deselect();
+        var d = new ActionDescriptor(), r = new ActionReference(), offset = new ActionDescriptor();
+        r.putIdentifier(S('layer'),root.id); d.putReference(S('null'),r);
+        offset.putUnitDouble(S('horizontal'),S('pixelsUnit'),dx);
+        offset.putUnitDouble(S('vertical'),S('pixelsUnit'),dy);
+        d.putObject(S('to'),S('offset'),offset);
+        executeAction(S('move'),d,DialogModes.NO);
+    }
     function translateRoot(root, anchor) {
         var b = bounds(anchor.id), dx = anchor.box[0] - b[0], dy = anchor.box[1] - b[1];
         if (!near(b[2]-b[0], anchor.box[2]-anchor.box[0]) || !near(b[3]-b[1], anchor.box[3]-anchor.box[1]))
@@ -178,7 +231,17 @@
         if (!near(dx,0) || !near(dy,0)) {
             // Fractional translations can resample bitmap content. Refuse rather than degrade it.
             if (!near(dx,Math.round(dx)) || !near(dy,Math.round(dy))) fail('Deslocamento fracionário inesperado; conversão interrompida.');
-            root.translate(UnitValue(Math.round(dx),'px'), UnitValue(Math.round(dy),'px'));
+            // Do not inherit a previous group selection or an active mask channel.
+            select(root.id);
+            copy.activeChannels = copy.componentChannels;
+            lastMove = root.name + ' (ID ' + root.id + '), dx=' + Math.round(dx) + ', dy=' + Math.round(dy);
+            moveGroupByID(root,Math.round(dx),Math.round(dy));
+            var actual = bounds(anchor.id);
+            for (var edge = 0; edge < 4; edge++) {
+                if (!near(actual[edge],anchor.box[edge]))
+                    fail('O marcador do grupo não acompanhou o movimento.\nGrupo: ' + lastMove +
+                        '\nEsperado: [' + anchor.box.join(', ') + ']\nObtido: [' + actual.join(', ') + ']');
+            }
         }
     }
     function repairCoordinates() {
@@ -210,14 +273,66 @@
         return result;
     }
     function alignBoards(canvas) {
-        var expected = alignedGeometry(canvas);
+        var expected = alignedGeometry(canvas), owners = {}, currentExpected = [];
+        // Freeze membership before moving anything. Order and names do not identify layers.
+        for (var j = 0; j < records.length; j++) {
+            var rec = records[j]; if (!rec.box) continue;
+            currentExpected.push({id:rec.id,name:rec.name,box:rec.box.slice(0)});
+            for (var k = 0; k < boards.length; k++) {
+                if (descendant(rec.id,resolved(boards[k].id))) { owners['i'+rec.id] = boards[k].id; break; }
+            }
+        }
         for (var i = 0; i < boards.length; i++) {
             var board = boards[i], offset = boardOffset(board,canvas), b = board.marker.box;
+            update('Alinhando ' + (i+1) + '/' + boards.length + ': ' + board.name,75);
             translateRoot(find(copy,resolved(board.id)),{id:board.marker.id,
                 box:[b[0]+offset[0],b[1]+offset[1],b[2]+offset[0],b[3]+offset[1]]});
+            for (j = 0; j < currentExpected.length; j++) {
+                rec = currentExpected[j];
+                if (owners['i'+rec.id] === board.id) {
+                    rec.box = [rec.box[0]+offset[0],rec.box[1]+offset[1],rec.box[2]+offset[0],rec.box[3]+offset[1]];
+                }
+            }
+            // Verify ALL original leaves after EVERY group move. Catch cross-group side effects
+            // at the responsible operation, not after a later unrelated group has moved.
+            checkPositions(0,0,currentExpected);
         }
-        // Every original leaf must keep its position relative to its own artboard.
         checkPositions(0,0,expected);
+    }
+    function positionFailure(rec, actual, expected) {
+        var owner = 'Fora de artboard', layer = find(copy,rec.id), linked = [], ancestors = [];
+        for (var i = 0; i < boards.length; i++) {
+            if (descendant(rec.id,resolved(boards[i].id))) {
+                owner = boards[i].name + ' (origem ' + boards[i].rect[0] + ', ' + boards[i].rect[1] + ')'; break;
+            }
+        }
+        if (layer) { try { for (i = 0; i < layer.linkedLayers.length; i++) linked.push(layer.linkedLayers[i].id); } catch (_) {} }
+        var parent = layer ? layer.parent : null;
+        while (parent && parent.typename !== 'Document') {
+            var groupLinks = [];
+            try { for (i = 0; i < parent.linkedLayers.length; i++) groupLinks.push(parent.linkedLayers[i].id); } catch (_) {}
+            ancestors.push(parent.name + ' (ID ' + parent.id + '; vínculos: ' + (groupLinks.length ? groupLinks.join(', ') : 'nenhum detectado') + ')');
+            parent = parent.parent;
+        }
+        var delta = []; for (i = 0; i < 4; i++) delta.push(actual[i]-expected[i]);
+        return 'Verificação de posição falhou em "' + rec.name + '" (ID ' + rec.id + ').' +
+            '\nArtboard: ' + owner + '\nQuantidade de artboards: ' + boards.length +
+            '\nOrigem do quadro: [' + (boards.length ? boards[0].rect[0] + ', ' + boards[0].rect[1] : '?') + ']' +
+            '\nGrupos ancestrais: ' + (ancestors.length ? ancestors.join(' > ') : 'nenhum') +
+            '\nTipo: ' + (layer && layer.typename === 'ArtLayer' ? layer.kind : 'não disponível') +
+            '\nLayers vinculadas (IDs): ' + (linked.length ? linked.join(', ') : 'nenhuma detectada') +
+            '\nLimites: [esquerda, topo, direita, base], em pixels.' +
+            '\nEsperado: [' + expected.join(', ') + ']\nObtido: [' + actual.join(', ') + ']' +
+            '\nDiferenças: [' + delta.join(', ') + ']\nÚltimo grupo movido: ' + lastMove +
+            '\nNenhum PSD foi salvo.';
+    }
+    function showFailure(message) {
+        var w = new Window('dialog',TITLE);
+        w.orientation = 'column'; w.alignChildren = 'fill';
+        w.add('statictext',undefined,'Diagnóstico copiável — selecione o texto abaixo para copiar.');
+        var field = w.add('edittext',undefined,message,{multiline:true,scrolling:true,readonly:true});
+        field.preferredSize = [680,380];
+        w.add('button',undefined,'Fechar',{name:'ok'}); w.show();
     }
     function checkPositions(dx, dy, baseline) {
         var geometry = baseline || records;
@@ -225,7 +340,7 @@
             var rec = geometry[i]; if (!rec.box || !nonempty(rec.box)) continue;
             var b = bounds(rec.id), expected = [rec.box[0]+dx,rec.box[1]+dy,rec.box[2]+dx,rec.box[3]+dy];
             for (var j = 0; j < 4; j++) if (!near(b[j],expected[j]))
-                fail('Verificação de posição falhou em "' + rec.name + '" (ID ' + rec.id + '). Nenhum PSD foi salvo.');
+                fail(positionFailure(rec,b,expected));
         }
     }
     function cropWithoutDeleting(b) {
@@ -301,6 +416,9 @@
             fail('Para importar layers no After Effects, use RGB ou tons de cinza. Prepare uma cópia nesse modo e execute novamente.');
         var roots = ids(copy); scan(copy,0,0);
         if (!boards.length) fail('Nenhuma artboard foi encontrada no documento.');
+        stage = 'Desativando aninhamento e reposicionamento automáticos na cópia';
+        disableArtboardAutomation();
+        checkParents(roots);
         // First means the topmost artboard in the Layers panel, including hidden boards.
         var canvas = boards[0].rect.slice(0);
         for (var edge = 0; edge < 4; edge++) {
@@ -318,7 +436,8 @@
         copy.selection.deselect();
         // Add markers to ALL boards before any dissolution can change the document origin.
         for (i = 0; i < boards.length; i++) makeMarker(boards[i]);
-        for (i = 0; i < boards.length; i++) { update('Convertendo ' + (i+1) + '/' + boards.length + ': ' + boards[i].name,10+50*i/boards.length); convert(boards[i]); }
+        for (i = 0; i < boards.length; i++) { update('Convertendo ' + (i+1) + '/' + boards.length + ': ' + boards[i].name,10+50*i/boards.length); convert(boards[i]); checkParents(roots); }
+        checkParents(roots);
         update('Conferindo offsets e coordenadas...',65);
         repairCoordinates(); checkPositions(0,0);
         update('Alinhando todos os grupos ao quadro da primeira artboard...',75);
@@ -358,7 +477,7 @@
         var cleanup = '';
         if (copy) { try { copy.close(SaveOptions.DONOTSAVECHANGES); } catch (_) { cleanup = '\nA cópia incompleta permaneceu aberta; descarte-a sem salvar.'; } }
         if (source) { try { app.activeDocument = source; } catch (_) {} }
-        alert('Conversão interrompida em: ' + stage + '\n\n' + error.message +
+        showFailure('Versão: 1.0.3\nPhotoshop: ' + app.version + '\nConversão interrompida em: ' + stage + '\n\n' + error.message +
             (error.line ? '\nLinha: ' + error.line : '') + '\n\nO documento original não foi alterado.' + cleanup,TITLE);
     } finally {
         app.preferences.rulerUnits = oldUnits; app.displayDialogs = oldDialogs;
