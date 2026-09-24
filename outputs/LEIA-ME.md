@@ -1,4 +1,4 @@
-# Artboards 2 AE — versão 1.0.0
+# Artboards 2 AE — versão 1.0.1
 
 Script JSX para Photoshop desktop, com interface em português. Trabalha em uma cópia aberta do documento; não edita nem salva o original. Projetado para Photoshop com suporte a artboards e ExtendScript.
 

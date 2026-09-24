@@ -6,3 +6,6 @@ work/
 
 # Registros comerciais preenchidos ficam fora do versionamento.
 comercial-privado/
+
+# Pacotes gerados e publicados como anexos da release.
+outputs/releases/

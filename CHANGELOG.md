@@ -1,5 +1,11 @@
 # Histórico de versões
 
+## 1.0.1 — 2026-09-23
+
+- Primeira distribuição empacotada com a licença proprietária e o guia.
+- Inclui processo comercial e modelos de cadastro e apuração.
+- Sem mudanças na lógica de conversão; validação no Photoshop e After Effects ainda pendente.
+
 ## Processo comercial — 2026-09-23
 
 - Canal oficial gustavo@mooshmassacre.studio; Pix em BRL e PayPal internacional.

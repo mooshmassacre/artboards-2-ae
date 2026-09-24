@@ -1,6 +1,6 @@
 # Artboards 2 AE
 
-Versão **1.0.0** — script JSX para converter artboards do Adobe Photoshop em grupos, preparando um PSD para After Effects.
+Versão **1.0.1** — script JSX para converter artboards do Adobe Photoshop em grupos, preparando um PSD para After Effects.
 
 ## Uso
 
@@ -18,7 +18,7 @@ Com Node.js instalado, execute na raiz do repositório:
 node tests/validate.cjs
 ```
 
-A análise de sintaxe e os testes de lógica usam substitutos das APIs. A versão 1.0.0 ainda não foi validada dentro do Photoshop ou After Effects.
+A análise de sintaxe e os testes de lógica usam substitutos das APIs. A versão 1.0.1 ainda não foi validada dentro do Photoshop ou After Effects.
 
 ## Arquivos
 

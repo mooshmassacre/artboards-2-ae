@@ -1,5 +1,5 @@
 #target photoshop
-/* Artboards 2 AE — v1.0.0
+/* Artboards 2 AE — v1.0.1
    Copyright (c) 2026 @mooshmassacre. Direitos reservados conforme lei aplicavel.
    Licenca proprietaria restrita: consulte LICENSE.md antes de usar ou adaptar.
    Creditos obrigatorios: Artboards 2 AE — @mooshmassacre.
